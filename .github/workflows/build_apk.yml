@@ -23,9 +23,12 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.2'
           channel: stable
           cache: true
+
+      - name: Create Flutter Project Structure
+        run: |
+          flutter create . --project-name all_calculator
 
       - name: Flutter Pub Get
         run: flutter pub get
