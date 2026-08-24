@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 void main() => runApp(const AllCalculatorApp());
 
@@ -26,14 +25,11 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Map<String, dynamic>>[
-      {'title': 'Normal Calculator', 'icon': Icons.calculate, 'page': const NormalCalculator()},
-      {'title': 'Square Feet', 'icon': Icons.square_foot, 'page': const SquareFeetPage()},
       {'title': 'Unit Converter', 'icon': Icons.straighten, 'page': const UnitConverterPage()},
       {'title': 'Discount Calculator', 'icon': Icons.percent, 'page': const DiscountPage()},
       {'title': 'Profit / Loss', 'icon': Icons.trending_up, 'page': const ProfitLossPage()},
       {'title': 'GST Calculator', 'icon': Icons.receipt_long, 'page': const GstPage()},
       {'title': 'Extra Expense %', 'icon': Icons.local_shipping, 'page': const ExpensePage()},
-      {'title': 'Quantity × Rate', 'icon': Icons.inventory_2, 'page': const QuantityPage()},
       {'title': 'MRP / Sale Price', 'icon': Icons.sell, 'page': const MrpPage()},
     ];
 
@@ -89,71 +85,7 @@ Widget result(String text) => Card(
 
 double val(TextEditingController c) => double.tryParse(c.text.trim()) ?? 0;
 
-class NormalCalculator extends StatefulWidget {
-  const NormalCalculator({super.key});
-  @override State<NormalCalculator> createState() => _NormalCalculatorState();
-}
-class _NormalCalculatorState extends State<NormalCalculator> {
-  String display = '0';
-  double first = 0;
-  String op = '';
-  bool fresh = true;
 
-  void press(String x) {
-    setState(() {
-      if (x == 'C') { display = '0'; first = 0; op = ''; fresh = true; return; }
-      if (x == '⌫') { display = display.length > 1 ? display.substring(0, display.length - 1) : '0'; return; }
-      if ('0123456789.'.contains(x)) {
-        if (fresh || display == '0') display = x == '.' ? '0.' : x;
-        else if (!(x == '.' && display.contains('.'))) display += x;
-        fresh = false; return;
-      }
-      if ('+-×÷'.contains(x)) { first = double.tryParse(display) ?? 0; op = x; fresh = true; return; }
-      if (x == '=') {
-        final second = double.tryParse(display) ?? 0;
-        double r = first;
-        if (op == '+') r = first + second;
-        if (op == '-') r = first - second;
-        if (op == '×') r = first * second;
-        if (op == '÷') r = second == 0 ? double.nan : first / second;
-        display = r.isNaN ? 'Error' : r.toStringAsFixed(r.truncateToDouble() == r ? 0 : 6);
-        fresh = true;
-      }
-    });
-  }
-
-  @override Widget build(BuildContext context) {
-    final keys = ['C','⌫','÷','×','7','8','9','-','4','5','6','+','1','2','3','=','0','.'];
-    return Scaffold(
-      appBar: AppBar(title: const Text('Normal Calculator')),
-      body: Column(children: [
-        Expanded(child: Container(alignment: Alignment.bottomRight, padding: const EdgeInsets.all(24),
-          child: Text(display, style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold)))),
-        GridView.count(
-          shrinkWrap: true, crossAxisCount: 4, childAspectRatio: 1.5,
-          padding: const EdgeInsets.all(8), mainAxisSpacing: 6, crossAxisSpacing: 6,
-          children: keys.map((k) => ElevatedButton(onPressed: () => press(k), child: Text(k, style: const TextStyle(fontSize: 20)))).toList(),
-        )
-      ]),
-    );
-  }
-}
-
-class SquareFeetPage extends StatefulWidget {
-  const SquareFeetPage({super.key});
-  @override State<SquareFeetPage> createState() => _SquareFeetPageState();
-}
-class _SquareFeetPageState extends State<SquareFeetPage> {
-  final l = TextEditingController(), w = TextEditingController();
-  double r = 0;
-  @override Widget build(BuildContext context) => CalcPage(title: 'Square Feet Calculator', children: [
-    field(l, 'Length (feet)'), field(w, 'Width (feet)'),
-    ElevatedButton(onPressed: () => setState(() => r = val(l) * val(w)), child: const Text('Calculate')),
-    result('Area = ${r.toStringAsFixed(2)} sq ft'),
-    const SizedBox(height: 8),
-    const Text('For inches: area in sq ft = length(in) × width(in) ÷ 144'),
-  ]);
-}
 
 class UnitConverterPage extends StatefulWidget {
   const UnitConverterPage({super.key});
@@ -245,18 +177,6 @@ class _ExpensePageState extends State<ExpensePage>{
   ]);
 }
 
-class QuantityPage extends StatefulWidget {
-  const QuantityPage({super.key});
-  @override State<QuantityPage> createState()=>_QuantityPageState();
-}
-class _QuantityPageState extends State<QuantityPage>{
-  final q=TextEditingController(), r=TextEditingController(); double total=0;
-  void calc()=>setState(()=>total=val(q)*val(r));
-  @override Widget build(BuildContext context)=>CalcPage(title:'Quantity × Rate',children:[
-    field(q,'Quantity'),field(r,'Rate'),ElevatedButton(onPressed:calc,child:const Text('Calculate')),
-    result('Total = ₹${total.toStringAsFixed(2)}'),
-  ]);
-}
 
 class MrpPage extends StatefulWidget {
   const MrpPage({super.key});
